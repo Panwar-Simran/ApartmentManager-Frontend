@@ -1,0 +1,33 @@
+/* Login page */
+.login-logo {
+    width: 60px;
+    height: 60px;
+    background: #eeedfe;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.card {
+    border-radius: 12px;
+}
+
+.form-control:focus {
+    border-color: #534AB7;
+    box-shadow: 0 0 0 0.2rem rgba(83, 74, 183, 0.15);
+}
+
+.btn-primary {
+    background-color: #534AB7;
+    border-color: #534AB7;
+}
+
+.btn-primary:hover {
+    background-color: #3d3489;
+    border-color: #3d3489;
+}
