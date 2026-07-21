@@ -1,8 +1,8 @@
 // ─── MEMBER DASHBOARD ─────────────────────────────
 
-checkAuth();
-checkPasswordChanged();
-checkRole('MEMBER');
+//checkAuth();
+//checkPasswordChanged();
+//checkRole('MEMBER');
 
 const now = new Date();
 const currentMonth = now.getMonth() + 1;
