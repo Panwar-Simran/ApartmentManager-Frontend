@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report | ApartmentManager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-brand">
+           <i class="bi bi-buildings-fill fs-1 text-primary"></i>
+        <h6 class="d-inline ms-2">ApartmentManager</h6>
+        <br>
+        <small class="text-muted" id="roleLabel">Panel</small>
+    </div>
+    <nav class="nav flex-column mt-2" id="sidebarNav"></nav>
+</div>
+
+<!-- Topbar -->
+<div class="topbar">
+    <h6 class="page-title">Monthly Report</h6>
+    <div class="user-info">
+        <div class="avatar">PR</div>
+        <span id="topbarRole">Loading...</span>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+
+    <div id="message"></div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h5>Monthly Report</h5>
+        <p id="reportSubtitle">Select month and year to view report</p>
+    </div>
+
+    <!-- Filter Card -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-end g-3">
+                <div class="col-md-3">
+                    <label class="form-label">Month</label>
+                    <select class="form-select" id="reportMonth">
+                        <option value="">Select Month</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Year</label>
+                    <input type="number"
+                           class="form-control"
+                           id="reportYear"
+                           placeholder="e.g. 2026"
+                           min="2024"
+                           max="2030">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary"
+                            onclick="loadReport()">
+                        <i class="bi bi-search me-1"></i>
+                        View Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Content - hidden until loaded -->
+    <div id="reportContent" style="display:none">
+
+        <!-- Summary Cards -->
+        <div class="row g-3 mb-4" id="summaryCards"></div>
+
+        <!-- Two column layout -->
+        <div class="row g-3">
+
+            <!-- Payment Details -->
+            <div class="col-md-12">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="bi bi-cash-stack
+                                      text-primary me-2"></i>
+                            <span id="paymentSectionTitle">
+                                Payment Details
+                            </span>
+                        </h6>
+                        <div id="paymentDetailsTable"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Details -->
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">
+                            <i class="bi bi-receipt
+                                      text-muted me-2"></i>
+                            Expense Details
+                        </h6>
+                        <div id="expenseDetailsTable"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/report.js"></script>
+
+</body>
+</html>
