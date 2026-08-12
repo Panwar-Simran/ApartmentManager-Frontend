@@ -2,18 +2,19 @@
 
 // If already logged in → redirect to dashboard
 
-if(window.location.pathname.includes('login.html')){
+/*if(window.location.pathname.includes('login.html')){
     if(getToken()){
         redirectToDashboard();
     }
-}
+}*/
 
 
 //Login Form Submit
 const loginForm =document.getElementById('loginForm')
 if(loginForm){
     loginForm.addEventListener('submit', async function(e) {
-        const email=document.getElementById('email').ariaValueMax;
+         e.preventDefault();
+        const email=document.getElementById('email').value;
         const password=document.getElementById('password').value;
         const loginBtn=document.getElementById('loginBtn');
 
