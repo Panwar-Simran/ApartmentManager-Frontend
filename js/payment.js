@@ -85,7 +85,6 @@ function buildTabs() {
     const tabContent = document.getElementById('tabContent');
 
     if (role === 'PRADHANA') {
-        // Pradhana sees 2 tabs
         tabsContainer.innerHTML = `
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
@@ -109,7 +108,6 @@ function buildTabs() {
         tabContent.innerHTML = `
             <!-- All Payments Tab -->
             <div id="allPaymentsContent">
-                <!-- Cycle selector -->
                 <div class="card mb-3">
                     <div class="card-body">
                         <div class="row align-items-end">
@@ -170,12 +168,10 @@ function buildTabs() {
                 </div>
             </div>`;
 
-        // Load cycles for selector
         loadCyclesForSelector();
         loadMyPayments();
 
     } else {
-        // Member sees only own payments
         tabsContainer.innerHTML = `
             <div class="d-flex justify-content-between
                         align-items-center mb-3">
@@ -248,6 +244,7 @@ async function loadCyclesForSelector() {
 }
 
 // ─── LOAD CYCLES FOR UPLOAD MODAL ─────────────────
+// UPDATED - now includes payment summary on cycle select
 
 async function loadCyclesForUpload() {
     try {
@@ -264,8 +261,128 @@ async function loadCyclesForUpload() {
                     - ₹${cycle.amountPerMember}
                 </option>`;
         }
+
+        // Clear summary when modal opens
+        document.getElementById('paymentSummary').innerHTML = '';
+
+        // Load payment summary when cycle is selected
+        selector.onchange = loadPaymentSummary;
+
     } catch (error) {
         console.log('Error loading cycles:', error);
+    }
+}
+
+// ─── LOAD PAYMENT SUMMARY ─────────────────────────
+// Shows due amount, credit balance and final payable
+// Helps member understand exactly how much to pay
+
+async function loadPaymentSummary() {
+    const cycleId = document.getElementById('paymentCycleId').value;
+    const summaryDiv = document.getElementById('paymentSummary');
+
+    if (!cycleId) {
+        summaryDiv.innerHTML = '';
+        return;
+    }
+
+    try {
+        // Get my payments to find this cycle record
+        const payments = await apiCall('/api/payments/my', 'GET');
+
+        // Find payment for selected cycle
+        let myPayment = null;
+        for (let i = 0; i < payments.length; i++) {
+            if (payments[i].cycleId == cycleId) {
+                myPayment = payments[i];
+                break;
+            }
+        }
+
+        // Get credit balance
+        const credit = await apiCall('/api/credits/my', 'GET');
+        const creditBalance = parseFloat(credit.creditBalance);
+
+        if (myPayment) {
+
+            // If already paid
+            if (myPayment.status === 'PAID') {
+                summaryDiv.innerHTML = `
+                    <div class="alert alert-success mt-3 mb-0">
+                        <i class="bi bi-check-circle me-2"></i>
+                        <strong>Already Paid!</strong>
+                        Payment of
+                        ${formatCurrency(myPayment.paidAmount)}
+                        completed for this cycle.
+                    </div>`;
+                return;
+            }
+
+            // If under review
+            if (myPayment.status === 'UNDER_REVIEW') {
+                summaryDiv.innerHTML = `
+                    <div class="alert alert-warning mt-3 mb-0">
+                        <i class="bi bi-hourglass-split me-2"></i>
+                        <strong>Payment Under Review!</strong>
+                        Pradhana is reviewing your payment.
+                        Please wait for approval.
+                    </div>`;
+                return;
+            }
+
+            // If pending - show breakdown
+            const finalDue = parseFloat(myPayment.finalDue);
+            const creditToUse = Math.min(creditBalance, finalDue);
+            const actualPayable = Math.max(
+                0, finalDue - creditToUse);
+
+            summaryDiv.innerHTML = `
+                <div class="alert alert-info mt-3 mb-0">
+                    <div class="fw-500 mb-2">
+                        Payment Breakdown
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Monthly Due:</span>
+                        <strong>
+                            ${formatCurrency(finalDue)}
+                        </strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Credit Balance:</span>
+                        <strong class="text-success">
+                            - ${formatCurrency(creditBalance)}
+                        </strong>
+                    </div>
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between">
+                        <span><strong>You Pay:</strong></span>
+                        <strong class="text-primary"
+                                style="font-size:18px">
+                            ${formatCurrency(actualPayable)}
+                        </strong>
+                    </div>
+                    ${actualPayable === 0
+                        ? `<div class="mt-2 text-success small">
+                               <i class="bi bi-check-circle me-1"></i>
+                               Your credit covers full payment!
+                               No cash needed.
+                           </div>`
+                        : creditToUse > 0
+                            ? `<div class="mt-2 text-muted small">
+                                   <i class="bi bi-info-circle me-1"></i>
+                                   ${formatCurrency(creditToUse)}
+                                   credit will be auto deducted.
+                               </div>`
+                            : `<div class="mt-2 text-muted small">
+                                   <i class="bi bi-info-circle me-1"></i>
+                                   No credit available.
+                                   Pay full amount.
+                               </div>`}
+                </div>`;
+        }
+
+    } catch (error) {
+        console.log('Error loading payment summary:', error);
     }
 }
 
@@ -348,7 +465,10 @@ async function loadPaymentsByCycle() {
                                    Reject
                                </button>`
                             : p.status === 'PAID'
-                                ? '<span class="text-success"><i class="bi bi-check-circle"></i> Paid</span>'
+                                ? `<span class="text-success">
+                                       <i class="bi bi-check-circle"></i>
+                                       Paid
+                                   </span>`
                                 : '<span class="text-muted">-</span>'}
                     </td>
                 </tr>`;
@@ -463,15 +583,16 @@ async function uploadPayment() {
             document.getElementById('uploadPaymentModal'));
         modal.hide();
 
-        // Reset form
+        // Reset form and summary
         document.getElementById('uploadPaymentForm').reset();
+        document.getElementById('paymentSummary').innerHTML = '';
 
         showSuccess('message',
             role === 'PRADHANA'
                 ? 'Payment uploaded and auto approved!'
                 : 'Payment uploaded! Waiting for Pradhana approval.');
 
-        // Reload
+        // Reload payments
         loadMyPayments();
 
     } catch (error) {
