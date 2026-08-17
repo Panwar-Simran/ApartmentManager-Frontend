@@ -1,7 +1,7 @@
 // ─── MAINTENANCE MODULE ───────────────────────────
 
-//checkAuth();
-//checkPasswordChanged();
+checkAuth();
+checkPasswordChanged();
 
 const role = getRole();
 
