@@ -1,7 +1,7 @@
 // ─── PRADHANA DASHBOARD ───────────────────────────
 
-//checkAuth();
-//checkRole('PRADHANA');
+checkAuth();
+checkRole('PRADHANA');
 
 const now = new Date();
 const currentMonth = now.getMonth() + 1;
@@ -80,16 +80,20 @@ async function loadMonthlyReport() {
 
 // ─── LOAD UNDER REVIEW PAYMENTS ───────────────────
 
-function loadUnderReviewPayments(){
+function loadUnderReviewPayments(payments) {
+
+    console.log("Under Review Payments:", payments);
+
     const container = document.getElementById('underReviewPaymentsList');
 
     // Filter under review payments
-     const underReview = [];
-     for (let i = 0; i < payments.length; i++) {
+    const underReview = [];
+
+    for (let i = 0; i < payments.length; i++) {
         if (payments[i].status === 'UNDER_REVIEW') {
             underReview.push(payments[i]);
         }
-    }//pushing under review payments only 
+    }
 
     if (underReview.length === 0) {
         container.innerHTML = `
@@ -101,11 +105,12 @@ function loadUnderReviewPayments(){
     }
 
     let html = '';
+
     for (let i = 0; i < underReview.length; i++) {
         const payment = underReview[i];
+
         html += `
-            <div class="d-flex justify-content-between
-                        align-items-center py-2 border-bottom">
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                 <div>
                     <div style="font-size:14px;font-weight:500">
                         ${payment.memberName}
@@ -114,15 +119,18 @@ function loadUnderReviewPayments(){
                         Flat ${payment.flatNumber}
                     </small>
                 </div>
+
                 <div class="text-end">
                     <div style="font-size:14px">
                         ${formatCurrency(payment.finalDue)}
                     </div>
+
                     <div class="mt-1">
                         <button class="btn btn-sm btn-success me-1"
                                 onclick="approvePayment(${payment.id})">
                             Approve
                         </button>
+
                         <button class="btn btn-sm btn-danger"
                                 onclick="rejectPayment(${payment.id})">
                             Reject
@@ -168,33 +176,34 @@ async function rejectPayment(paymentId) {
 }
 
 
-// ─── LOAD PENDING PAYMENTS ────────────────────────
+function loadPendingPayments(payments) {
 
-function loadPendingPayments(payments){
-    const container=document.getElementById('pendingPaymentsList');
-     // Filter pending payments
+    const container = document.getElementById('pendingPaymentsList');
+    const pending = [];
 
-     for(let i=0 ;i<payments.length; i++){
+    // Filter pending payments
+    for (let i = 0; i < payments.length; i++) {
         if (payments[i].status === 'PENDING') {
             pending.push(payments[i]);
         }
-     }//for
+    }
 
-     if (pending.length === 0) {
+    if (pending.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
                 <i class="bi bi-check-circle text-success"></i>
                 <p>All payments done!</p>
             </div>`;
         return;
-    }//if eveyrone already pays
+    }
 
     let html = '';
+
     for (let i = 0; i < pending.length; i++) {
         const payment = pending[i];
+
         html += `
-            <div class="d-flex justify-content-between
-                        align-items-center py-2 border-bottom">
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                 <div>
                     <div style="font-size:14px;font-weight:500">
                         ${payment.memberName}
@@ -203,6 +212,7 @@ function loadPendingPayments(payments){
                         Flat ${payment.flatNumber}
                     </small>
                 </div>
+
                 <div class="text-end">
                     <div style="font-size:14px">
                         ${formatCurrency(payment.finalDue)}
@@ -213,11 +223,11 @@ function loadPendingPayments(payments){
     }
 
     container.innerHTML = html;
-}
+}//func
 
 
-// ─── LOAD RECENT EXPENSES ─────────────────────────
-function loadRecentExpenses(expenses) {//loads just 4 expenses or less
+function loadRecentExpenses(expenses) {
+
     const container = document.getElementById('recentExpensesList');
 
     if (!expenses || expenses.length === 0) {
@@ -230,11 +240,13 @@ function loadRecentExpenses(expenses) {//loads just 4 expenses or less
     }
 
     let html = '';
+
     for (let i = 0; i < Math.min(4, expenses.length); i++) {
+
         const expense = expenses[i];
+
         html += `
-            <div class="d-flex justify-content-between
-                        align-items-center py-2 border-bottom">
+            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                 <div>
                     <div style="font-size:14px">
                         ${expense.categoryName}
@@ -243,6 +255,7 @@ function loadRecentExpenses(expenses) {//loads just 4 expenses or less
                         ${expense.description || '-'}
                     </small>
                 </div>
+
                 <div style="font-size:14px;font-weight:500">
                     ${formatCurrency(expense.amount)}
                 </div>
@@ -250,7 +263,7 @@ function loadRecentExpenses(expenses) {//loads just 4 expenses or less
     }
 
     container.innerHTML = html;
-}
+}//func
 
 // ─── LOAD PENDING CONTRIBUTIONS ───────────────────
 async function loadPendingContributions() {
