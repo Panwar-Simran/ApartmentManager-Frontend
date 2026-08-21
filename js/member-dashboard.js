@@ -1,8 +1,8 @@
 // ─── MEMBER DASHBOARD ─────────────────────────────
 
-//checkAuth();
-//checkPasswordChanged();
-//checkRole('MEMBER');
+checkAuth();
+checkPasswordChanged();
+checkRole('MEMBER');
 
 const now = new Date();
 const currentMonth = now.getMonth() + 1;
@@ -46,16 +46,29 @@ async function loadMyPayments() {
         }
 
         // Show quick action banner based on status
-        if (currentPayment) {
-            document.getElementById('myPaymentStatus')
-                .innerHTML = getStatusBadge(currentPayment.status);
-            document.getElementById('myPaymentAmount')
-                .textContent = formatCurrency(currentPayment.finalDue)
-                + ' due this month';
+        // Show quick action banner based on status
+    if (currentPayment) {
+         document.getElementById('myPaymentStatus')
+        .innerHTML = getStatusBadge(currentPayment.status);
 
-            // Show quick action banner
-            showQuickActionBanner(currentPayment);
-        }
+    // FIXED - show different text based on status
+       if (currentPayment.status === 'PAID') {
+        document.getElementById('myPaymentAmount')
+            .textContent = 'Paid ' +
+            formatCurrency(currentPayment.paidAmount);
+      } else if (currentPayment.status === 'UNDER_REVIEW') {
+        document.getElementById('myPaymentAmount')
+            .textContent = 'Under review - awaiting approval';
+      } else {
+        // PENDING - show due amount
+        document.getElementById('myPaymentAmount')
+            .textContent = formatCurrency(currentPayment.finalDue)
+            + ' due this month';
+      }
+
+    // Show quick action banner
+    showQuickActionBanner(currentPayment);
+}
 
         // Build payment history
         let html = '';
